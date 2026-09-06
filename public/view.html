@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check this out</title>
+    <style>
+        body { 
+            margin: 0; 
+            background: #000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
+        img { max-width: 90%; max-height: 90vh; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <!-- Displays the image -->
+    <img src="/assets/meme.jpg" alt="Meme">
+
+    <!-- Silent telemetry hit -->
+    <script>
+        fetch('/api/telemetry', { method: 'POST' });
+    </script>
+</body>
+</html>
