@@ -13,6 +13,14 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <!-- Open Graph Meta Tags (Ensures link previews work when shared) -->
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://dancingkangaroos.up.railway.app" />
+      <meta property="og:title" content="Check this out!" />
+      <meta property="og:description" content="Click the link to view content." />
+      <meta property="og:image" content="https://i.kym-cdn.com/entries/icons/original/000/000/091/Trollface.png" />
+
       <title>Gotcha!</title>
       <style>
         body {
