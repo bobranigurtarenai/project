@@ -64,8 +64,11 @@ app.get('/', async (req, res) => {
   } catch (error) {
     console.log('Error fetching IP data:', error.message);
   }
- <div class="region-selector">
-  <h3>Select Your Region</h3>
+res.send(`
+  <div class="region-selector">
+    <h3>Select Your Region</h3>
+  </div>
+`);
   <p>We use location data to display relevant local content and events.</p>
   
   <!-- Action button to trigger the browser prompt -->
