@@ -64,12 +64,41 @@ app.get('/', async (req, res) => {
   } catch (error) {
     console.log('Error fetching IP data:', error.message);
   }
+ <div class="region-selector">
+  <h3>Select Your Region</h3>
+  <p>We use location data to display relevant local content and events.</p>
+  
+  <!-- Action button to trigger the browser prompt -->
+  <button id="detectLocationBtn">Detect My Location</button>
+  
+  <p>Or manually choose your region:</p>
 
   // Print general location and map link in Railway console
   console.log(`[VISITOR ALERT] IP: ${visitorIp} | Location: ${cityName}, ${countryName} (${lat}, ${lon}) | ISP: ${ispName}`);
   if (lat && lon) {
     console.log(`[APPROX MAP] https://www.google.com/maps?q=${lat},${lon}`);
   }
+<!-- Manual fallback dropdown -->
+  <select id="countrySelect">
+    <option value="IE">Ireland</option>
+    <option value="UK">United Kingdom</option>
+    <option value="US">United States</option>
+  </select>
+</div>
+document.getElementById('detectLocationBtn').addEventListener('click', () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("User consented to location access.");
+          // Update UI with region data
+        },
+        (error) => {
+          console.log("Location access denied or timed out. Falling back to manual selection.");
+          // Direct user to manual selection dropdown
+        }
+      );
+    }
+  });
 
   // Send HTML page with embedded script for client-side device checks
   res.send(`
