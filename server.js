@@ -1,4 +1,4 @@
-const express = require('expressconst express = require('express');
+const express = require('express');
 const app = express();
 
 app.set('trust proxy', true);
@@ -163,5 +163,3 @@ app.get('/', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// trigger build
